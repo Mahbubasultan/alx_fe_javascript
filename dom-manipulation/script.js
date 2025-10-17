@@ -315,3 +315,4 @@ async function syncQuotes() {
 
 // Optional: Periodic sync every 60 seconds
 setInterval(syncQuotes, 60000);
+console.log("Quotes synced with server!");
