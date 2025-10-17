@@ -8,7 +8,7 @@ let quotes = [
   { text: "Success is not the key to happiness. Happiness is the key to success.", category: "Happiness" },
 ];
 
-// Load existing quotes from localStorage if available
+// Load quotes from localStorage
 function loadQuotes() {
   const storedQuotes = localStorage.getItem(LOCAL_KEY);
   if (storedQuotes) {
@@ -21,7 +21,7 @@ function saveQuotes() {
   localStorage.setItem(LOCAL_KEY, JSON.stringify(quotes));
 }
 
-// Display random quote
+// Show random quote
 function showRandomQuote() {
   const randomIndex = Math.floor(Math.random() * quotes.length);
   const randomQuote = quotes[randomIndex];
@@ -29,28 +29,38 @@ function showRandomQuote() {
     <p>"${randomQuote.text}"</p>
     <p class="category">— ${randomQuote.category}</p>
   `;
-
-  // Save last viewed index in sessionStorage
   sessionStorage.setItem("lastViewedIndex", randomIndex);
+}
+
+// Create the “Add Quote” form dynamically
+function createAddQuoteForm() {
+  const form = document.createElement("div");
+  form.innerHTML = `
+    <input id="newQuoteText" type="text" placeholder="Enter a new quote" />
+    <input id="newQuoteCategory" type="text" placeholder="Enter quote category" />
+    <button id="addQuoteBtn">Add Quote</button>
+  `;
+  document.body.appendChild(form);
+
+  document.getElementById("addQuoteBtn").addEventListener("click", addQuote);
 }
 
 // Add new quote
 function addQuote() {
   const newText = document.getElementById("newQuoteText").value.trim();
   const newCategory = document.getElementById("newQuoteCategory").value.trim();
-
   if (newText && newCategory) {
     quotes.push({ text: newText, category: newCategory });
-    saveQuotes(); // Save to localStorage
+    saveQuotes();
     alert("New quote added and saved!");
     document.getElementById("newQuoteText").value = "";
     document.getElementById("newQuoteCategory").value = "";
   } else {
-    alert("Please fill out both fields.");
+    alert("Please fill in both fields!");
   }
 }
 
-// Export quotes to JSON file
+// Export quotes as JSON file
 function exportToJson() {
   const jsonData = JSON.stringify(quotes, null, 2);
   const blob = new Blob([jsonData], { type: "application/json" });
@@ -58,9 +68,7 @@ function exportToJson() {
   const a = document.createElement("a");
   a.href = url;
   a.download = "quotes.json";
-  document.body.appendChild(a);
   a.click();
-  document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
 
@@ -79,11 +87,24 @@ function importFromJsonFile(event) {
 // Initialize
 window.onload = () => {
   loadQuotes();
+
   document.getElementById("newQuote").addEventListener("click", showRandomQuote);
-  document.getElementById("addQuoteBtn").addEventListener("click", addQuote);
+
+  // Create dynamic form
+  createAddQuoteForm();
+
+  // Add Export/Import section
+  const jsonSection = document.createElement("div");
+  jsonSection.innerHTML = `
+    <br />
+    <button id="exportBtn">Export Quotes (JSON)</button>
+    <input type="file" id="importFile" accept=".json" onchange="importFromJsonFile(event)" />
+  `;
+  document.body.appendChild(jsonSection);
+
   document.getElementById("exportBtn").addEventListener("click", exportToJson);
 
-  // Restore last viewed quote
+  // Restore last viewed quote from sessionStorage
   const lastIndex = sessionStorage.getItem("lastViewedIndex");
   if (lastIndex !== null && quotes[lastIndex]) {
     const lastQuote = quotes[lastIndex];
