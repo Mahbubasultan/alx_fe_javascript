@@ -12,53 +12,34 @@ h1 {
   margin-bottom: 20px;
 }
 
-.controls, .add-quote, .json-section {
-  margin-bottom: 20px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
-}
-
-#categoryFilter {
-  padding: 5px;
-  font-size: 16px;
+select, button, input[type="text"] {
+  padding: 5px 8px;
+  margin: 5px 0;
+  font-size: 14px;
 }
 
 button {
-  padding: 5px 12px;
   cursor: pointer;
   background-color: #0077ff;
   border: none;
   color: white;
   border-radius: 4px;
-  font-size: 14px;
 }
 
 button:hover {
   background-color: #005fcc;
 }
 
-input[type="text"] {
-  padding: 5px;
-  font-size: 14px;
-  width: 200px;
-}
-
-.quote-display {
+#quoteDisplay {
   background-color: #fff;
   padding: 15px;
   border-radius: 6px;
   box-shadow: 0 0 5px rgba(0,0,0,0.1);
   min-height: 100px;
-}
-
-.quote-item {
-  margin-bottom: 15px;
+  margin-top: 15px;
 }
 
 .quote-item .category {
   font-style: italic;
-  font-size: 14px;
   color: #555;
 }

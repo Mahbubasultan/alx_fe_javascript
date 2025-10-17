@@ -10,28 +10,20 @@
   <h1>Dynamic Quote Generator</h1>
 
   <!-- Category Filter -->
-  <div class="controls">
-    <label for="categoryFilter">Filter by Category:</label>
-    <select id="categoryFilter">
-      <option value="all">All Categories</option>
-    </select>
-    <button id="newQuote">Show New Quote</button>
-  </div>
+  <select id="categoryFilter" onchange="filterQuotes()">
+    <option value="all">All Categories</option>
+  </select>
+
+  <!-- Show New Quote -->
+  <button id="newQuote">Show New Quote</button>
 
   <!-- Quote Display -->
-  <div id="quoteDisplay" class="quote-display"></div>
+  <div id="quoteDisplay"></div>
 
-  <!-- Add New Quote -->
-  <div class="add-quote">
-    <input id="newQuoteText" type="text" placeholder="Enter a new quote">
-    <input id="newQuoteCategory" type="text" placeholder="Enter quote category">
-    <button id="addQuoteBtn">Add Quote</button>
-  </div>
-
-  <!-- JSON Import / Export -->
+  <!-- JSON Import/Export -->
   <div class="json-section">
     <button id="exportBtn">Export Quotes (JSON)</button>
-    <input type="file" id="importFile" accept=".json">
+    <input type="file" id="importFile" accept=".json" onchange="importFromJsonFile(event)">
   </div>
 
   <script src="script.js"></script>
