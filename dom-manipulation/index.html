@@ -46,6 +46,11 @@
   <div id="controls">
     <button id="newQuote">Show New Quote</button>
   </div>
+  <div style="margin-top: 20px;">
+  <button id="exportBtn">Export Quotes (JSON)</button>
+  <input type="file" id="importFile" accept=".json" onchange="importFromJsonFile(event)" />
+</div>
+
 
   <div id="addQuoteForm"></div>
 
