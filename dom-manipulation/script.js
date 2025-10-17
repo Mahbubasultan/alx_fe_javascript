@@ -12,9 +12,7 @@ let quotes = [
 // --- Step 1: Load & Save Quotes ---
 function loadQuotes() {
   const storedQuotes = localStorage.getItem(LOCAL_KEY_QUOTES);
-  if (storedQuotes) {
-    quotes = JSON.parse(storedQuotes);
-  }
+  if (storedQuotes) quotes = JSON.parse(storedQuotes);
 }
 
 function saveQuotes() {
@@ -27,14 +25,25 @@ function showQuotes(filteredQuotes = quotes) {
   quoteDisplay.innerHTML = "";
 
   if (filteredQuotes.length === 0) {
-    quoteDisplay.innerHTML = "<p>No quotes found for this category.</p>";
+    const noQuoteMsg = document.createElement("p");
+    noQuoteMsg.textContent = "No quotes found for this category.";
+    quoteDisplay.appendChild(noQuoteMsg);
     return;
   }
 
   filteredQuotes.forEach((q) => {
     const div = document.createElement("div");
     div.classList.add("quote-item");
-    div.innerHTML = `<p>"${q.text}"</p><p class="category">— ${q.category}</p>`;
+
+    const textP = document.createElement("p");
+    textP.textContent = `"${q.text}"`;
+
+    const catP = document.createElement("p");
+    catP.classList.add("category");
+    catP.textContent = `— ${q.category}`;
+
+    div.appendChild(textP);
+    div.appendChild(catP);
     quoteDisplay.appendChild(div);
   });
 }
@@ -42,14 +51,27 @@ function showQuotes(filteredQuotes = quotes) {
 // --- Step 3: Create Add Quote Form ---
 function createAddQuoteForm() {
   const form = document.createElement("div");
-  form.innerHTML = `
-    <input id="newQuoteText" type="text" placeholder="Enter a new quote" />
-    <input id="newQuoteCategory" type="text" placeholder="Enter quote category" />
-    <button id="addQuoteBtn">Add Quote</button>
-  `;
+
+  const textInput = document.createElement("input");
+  textInput.id = "newQuoteText";
+  textInput.type = "text";
+  textInput.placeholder = "Enter a new quote";
+
+  const categoryInput = document.createElement("input");
+  categoryInput.id = "newQuoteCategory";
+  categoryInput.type = "text";
+  categoryInput.placeholder = "Enter quote category";
+
+  const addBtn = document.createElement("button");
+  addBtn.id = "addQuoteBtn";
+  addBtn.textContent = "Add Quote";
+
+  form.appendChild(textInput);
+  form.appendChild(categoryInput);
+  form.appendChild(addBtn);
   document.body.appendChild(form);
 
-  document.getElementById("addQuoteBtn").addEventListener("click", addQuote);
+  addBtn.addEventListener("click", addQuote);
 }
 
 // --- Step 4: Add New Quote ---
@@ -60,7 +82,7 @@ function addQuote() {
   if (newText && newCategory) {
     quotes.push({ text: newText, category: newCategory });
     saveQuotes();
-    populateCategories(); // update category list dynamically
+    populateCategories();
     alert("New quote added and saved!");
     document.getElementById("newQuoteText").value = "";
     document.getElementById("newQuoteCategory").value = "";
@@ -74,9 +96,13 @@ function populateCategories() {
   const categoryFilter = document.getElementById("categoryFilter");
   const categories = ["all", ...new Set(quotes.map((q) => q.category))];
 
-  categoryFilter.innerHTML = categories
-    .map((cat) => `<option value="${cat}">${cat}</option>`)
-    .join("");
+  categoryFilter.innerHTML = "";
+  categories.forEach((cat) => {
+    const option = document.createElement("option");
+    option.value = cat;
+    option.textContent = cat;
+    categoryFilter.appendChild(option);
+  });
 
   const savedFilter = localStorage.getItem(LOCAL_KEY_FILTER) || "all";
   categoryFilter.value = savedFilter;
@@ -87,12 +113,12 @@ function filterQuotes() {
   const selectedCategory = document.getElementById("categoryFilter").value;
   localStorage.setItem(LOCAL_KEY_FILTER, selectedCategory);
 
-  if (selectedCategory === "all") {
-    showQuotes(quotes);
-  } else {
-    const filtered = quotes.filter((q) => q.category === selectedCategory);
-    showQuotes(filtered);
-  }
+  const filtered =
+    selectedCategory === "all"
+      ? quotes
+      : quotes.filter((q) => q.category === selectedCategory);
+
+  showQuotes(filtered);
 }
 
 // --- Step 7: JSON Import/Export ---
@@ -124,32 +150,37 @@ function importFromJsonFile(event) {
 window.onload = () => {
   loadQuotes();
 
-  // Create UI elements
-  const controls = document.createElement("div");
-  controls.innerHTML = `
-    <h2>Dynamic Quote Generator</h2>
-    <select id="categoryFilter" onchange="filterQuotes()">
-      <option value="all">All Categories</option>
-    </select>
-    <div id="quoteDisplay"></div>
-  `;
-  document.body.appendChild(controls);
+  const title = document.createElement("h2");
+  title.textContent = "Dynamic Quote Generator";
+  document.body.appendChild(title);
+
+  const categoryFilter = document.createElement("select");
+  categoryFilter.id = "categoryFilter";
+  categoryFilter.addEventListener("change", filterQuotes);
+  document.body.appendChild(categoryFilter);
+
+  const quoteDisplay = document.createElement("div");
+  quoteDisplay.id = "quoteDisplay";
+  document.body.appendChild(quoteDisplay);
 
   createAddQuoteForm();
 
-  // Export/Import section
   const jsonSection = document.createElement("div");
-  jsonSection.innerHTML = `
-    <br />
-    <button id="exportBtn">Export Quotes (JSON)</button>
-    <input type="file" id="importFile" accept=".json" onchange="importFromJsonFile(event)" />
-  `;
+  const exportBtn = document.createElement("button");
+  exportBtn.id = "exportBtn";
+  exportBtn.textContent = "Export Quotes (JSON)";
+  exportBtn.addEventListener("click", exportToJson);
+
+  const importInput = document.createElement("input");
+  importInput.type = "file";
+  importInput.id = "importFile";
+  importInput.accept = ".json";
+  importInput.addEventListener("change", importFromJsonFile);
+
+  jsonSection.appendChild(exportBtn);
+  jsonSection.appendChild(importInput);
   document.body.appendChild(jsonSection);
 
-  // Add listeners
-  document.getElementById("exportBtn").addEventListener("click", exportToJson);
-
-  // Load categories & filter
   populateCategories();
   filterQuotes();
 };
