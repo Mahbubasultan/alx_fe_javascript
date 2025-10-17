@@ -270,3 +270,48 @@ function addQuote() {
     alert("Please fill in both fields!");
   }
 }
+// --- Task 3: Sync quotes with server ---
+async function syncQuotes() {
+  try {
+    // 1️⃣ Fetch server quotes
+    const response = await fetch("https://jsonplaceholder.typicode.com/posts");
+    if (!response.ok) throw new Error("Failed to fetch server quotes");
+    const serverData = await response.json();
+
+    // Transform server data to quote objects
+    const serverQuotes = serverData.slice(0, 5).map(item => ({
+      text: item.title,
+      category: "Server Quote"
+    }));
+
+    // 2️⃣ Merge with local quotes (server takes precedence)
+    const mergedQuotes = [...serverQuotes];
+    quotes.forEach(localQuote => {
+      if (!mergedQuotes.some(q => q.text === localQuote.text)) {
+        mergedQuotes.push(localQuote);
+      }
+    });
+
+    quotes = mergedQuotes;
+    saveQuotes();
+    populateCategories();
+    filterQuotes();
+
+    console.log("Quotes successfully synced with server!");
+
+    // 3️⃣ Send new local quotes to server
+    for (const quote of quotes) {
+      await fetch("https://jsonplaceholder.typicode.com/posts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(quote)
+      });
+    }
+
+  } catch (err) {
+    console.error("Error syncing quotes:", err);
+  }
+}
+
+// Optional: Periodic sync every 60 seconds
+setInterval(syncQuotes, 60000);
