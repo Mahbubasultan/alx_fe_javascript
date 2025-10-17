@@ -231,3 +231,42 @@ async function fetchQuotesFromServer() {
 
 // --- Optional: periodic sync every 60 seconds ---
 setInterval(fetchQuotesFromServer, 60000);
+// --- Task 3: Send new quote to server ---
+async function sendQuoteToServer(quote) {
+  try {
+    const response = await fetch("https://jsonplaceholder.typicode.com/posts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(quote)
+    });
+
+    if (!response.ok) throw new Error("Failed to send quote to server");
+
+    const serverData = await response.json();
+    console.log("Quote successfully sent to server:", serverData);
+  } catch (err) {
+    console.error("Error sending quote to server:", err);
+  }
+}
+
+// --- Modify addQuote() to send new quote to server ---
+function addQuote() {
+  const newText = document.getElementById("newQuoteText").value.trim();
+  const newCategory = document.getElementById("newQuoteCategory").value.trim();
+
+  if (newText && newCategory) {
+    const newQuote = { text: newText, category: newCategory };
+    quotes.push(newQuote);
+    saveQuotes();
+    populateCategories();
+    filterQuotes();
+    sendQuoteToServer(newQuote); // <--- send to server
+    alert("New quote added!");
+    document.getElementById("newQuoteText").value = "";
+    document.getElementById("newQuoteCategory").value = "";
+  } else {
+    alert("Please fill in both fields!");
+  }
+}
